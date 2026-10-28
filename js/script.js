@@ -16,6 +16,7 @@
  */
 const ARTEFAK_ITEMS = [
   {
+    id: "rpp",
     icon: "📄",
     title: "Rencana Pelaksanaan Pembelajaran (RPP)",
     slug: "rencana-pelaksanaan-pembelajaran-rpp",
@@ -26,6 +27,7 @@ const ARTEFAK_ITEMS = [
     images: [],
   },
   {
+    id: "media",
     icon: "🖥️",
     title: "Media Pembelajaran",
     slug: "media-pembelajaran",
@@ -36,6 +38,7 @@ const ARTEFAK_ITEMS = [
     images: [],
   },
   {
+    id: "hasil",
     icon: "✍️",
     title: "Contoh Hasil Kerja Murid",
     slug: "contoh-hasil-kerja-murid",
@@ -46,6 +49,7 @@ const ARTEFAK_ITEMS = [
     images: [],
   },
   {
+    id: "foto",
     icon: "📸",
     title: "Foto / Video Pembelajaran",
     slug: "fotovideo-pembelajaran",
@@ -56,6 +60,7 @@ const ARTEFAK_ITEMS = [
     images: [],
   },
   {
+    id: "analisis",
     icon: "📊",
     title: "Analisis Artefak Produk",
     slug: "analisis-artefak-produk",
@@ -66,6 +71,7 @@ const ARTEFAK_ITEMS = [
     images: [],
   },
   {
+    id: "refleksi",
     icon: "🔍",
     title: "Refleksi Artefak Produk",
     slug: "refleksi-artefak-produk",
@@ -103,6 +109,7 @@ const SIKLUS_DATA = {
 /* ---------- Lampiran (modal — tanpa tautan keluar) ---------- */
 const LAMPIRAN_ITEMS = [
   {
+    id: "perangkat",
     icon: "📋",
     title: "Penilaian Penyusunan Perangkat Pembelajaran",
     note: "Lampiran",
@@ -112,6 +119,7 @@ const LAMPIRAN_ITEMS = [
     images: [],
   },
   {
+    id: "praktik",
     icon: "🎤",
     title: "Penilaian Praktik Mengajar",
     note: "Lampiran",
@@ -121,6 +129,7 @@ const LAMPIRAN_ITEMS = [
     images: [],
   },
   {
+    id: "foto",
     icon: "📸",
     title: "Foto / Video Kegiatan",
     note: "Lampiran",
@@ -140,12 +149,13 @@ function renderLampiran() {
     btn.type = "button";
     btn.className = "card link-card";
     btn.setAttribute("data-reveal", "");
+    const hasDoc = !!getDriveIdFor("lampiran", item);
     btn.innerHTML =
       `<span class="link-card__icon">${item.icon}</span>` +
       `<h3>${item.title}</h3>` +
       `<p>${item.desc}</p>` +
-      `<span class="link-card__go">${item.driveId ? "Lihat dokumen" : "Lihat detail"} →</span>`;
-    btn.addEventListener("click", () => openDoc(item, null));
+      `<span class="link-card__go">${hasDoc ? "Lihat dokumen" : "Lihat detail"} →</span>`;
+    btn.addEventListener("click", () => openDoc(item, "lampiran"));
     host.appendChild(btn);
   });
 }
@@ -153,6 +163,7 @@ function renderLampiran() {
 /* ---------- Lembar Kerja 3 — Non-Mengajar (modal — tanpa tautan keluar) ---------- */
 const LK3_ITEMS = [
   {
+    id: "laporan",
     icon: "📄",
     title: "Laporan Lembar Kerja 3 (Non-Mengajar)",
     note: "Dokumen utama",
@@ -162,6 +173,7 @@ const LK3_ITEMS = [
     images: [],
   },
   {
+    id: "pendukung",
     icon: "📎",
     title: "Dokumen Pendukung",
     note: "Lampiran laporan",
@@ -181,12 +193,13 @@ function renderLk3() {
     btn.type = "button";
     btn.className = "card link-card";
     btn.setAttribute("data-reveal", "");
+    const hasDoc = !!getDriveIdFor("lk3", item);
     btn.innerHTML =
       `<span class="link-card__icon">${item.icon}</span>` +
       `<h3>${item.title}</h3>` +
       `<p>${item.desc}</p>` +
-      `<span class="link-card__go">${item.driveId ? "Lihat dokumen" : "Lihat detail"} →</span>`;
-    btn.addEventListener("click", () => openDoc(item, null));
+      `<span class="link-card__go">${hasDoc ? "Lihat dokumen" : "Lihat detail"} →</span>`;
+    btn.addEventListener("click", () => openDoc(item, "lk3"));
     host.appendChild(btn);
   });
 }
@@ -214,12 +227,13 @@ function renderArtefak() {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "artefak-item";
+      const hasDoc = !!getDriveIdFor("artefak:" + key, item);
       btn.innerHTML =
         `<span class="artefak-item__icon">${item.icon}</span>` +
         `<h4>${item.title}</h4>` +
         `<span>${item.note}</span>` +
-        `<span class="artefak-item__cta">${item.driveId ? "Lihat dokumen" : "Lihat detail"} →</span>`;
-      btn.addEventListener("click", () => openDoc(item, key));
+        `<span class="artefak-item__cta">${hasDoc ? "Lihat dokumen" : "Lihat detail"} →</span>`;
+      btn.addEventListener("click", () => openDoc(item, "artefak:" + key));
       grid.appendChild(btn);
     });
 
@@ -229,21 +243,25 @@ function renderArtefak() {
 }
 
 /* ---------- Modal dokumen artefak ---------- */
-function openDoc(item, siklusKey) {
+function openDoc(item, groupKey) {
   const modal = document.getElementById("docModal");
   if (!modal) return;
 
+  let label = "";
+  if (groupKey && groupKey.indexOf("artefak:") === 0) {
+    const sk = groupKey.split(":")[1];
+    if (SIKLUS_DATA[sk]) label = SIKLUS_DATA[sk].label;
+  }
   document.getElementById("docIcon").textContent = item.icon;
   document.getElementById("docTitle").textContent = item.title;
-  const siklusLabel =
-    siklusKey && SIKLUS_DATA[siklusKey] ? SIKLUS_DATA[siklusKey].label : "";
   document.getElementById("docSub").textContent =
-    siklusLabel ? `${item.note} · ${siklusLabel}` : item.note;
+    label ? `${item.note} · ${label}` : item.note;
   document.getElementById("docDesc").textContent = item.desc || "";
 
   /* Area dokumen: embed Google Drive bila driveId diisi */
+  const driveId = getDriveIdFor(groupKey, item);
   const frame = document.getElementById("docFrame");
-  if (item.driveId) {
+  if (driveId) {
     frame.classList.remove("doc-frame--empty");
     frame.innerHTML =
       `<iframe src="https://drive.google.com/file/d/${item.driveId}/preview" ` +
@@ -549,8 +567,48 @@ function initVideoModal() {
   });
 }
 
+/* ---------- Data dokumen dari panel admin (data/dokumen.json) ---------- */
+const DOC_DRIVES = {};
+
+function parseDriveId(v) {
+  if (!v) return "";
+  const s = String(v).trim();
+  const m =
+    s.match(/\/file\/d\/([\w-]{10,})/) ||
+    s.match(/[?&]id=([\w-]{10,})/) ||
+    s.match(/^([\w-]{20,})$/);
+  return m ? m[1] : s;
+}
+
+function getDriveIdFor(groupKey, item) {
+  const map = DOC_DRIVES[groupKey];
+  return parseDriveId((map && map[item.id]) || item.driveId || "");
+}
+
+async function loadDokumenData() {
+  try {
+    const res = await fetch("data/dokumen.json", { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.artefak) {
+      Object.entries(data.artefak).forEach(
+        ([k, v]) => (DOC_DRIVES["artefak:" + k] = v || {})
+      );
+    }
+    if (data.lk3) DOC_DRIVES["lk3"] = data.lk3;
+    if (data.lampiran) DOC_DRIVES["lampiran"] = data.lampiran;
+    if (Array.isArray(data.videos) && data.videos.length) {
+      VIDEOS.length = 0;
+      data.videos.forEach((v) => VIDEOS.push(v));
+    }
+  } catch (e) {
+    /* file:// atau offline — pakai data default */
+  }
+}
+
 /* ---------- Boot ---------- */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadDokumenData();
   renderArtefak();
   renderLampiran();
   renderLk3();

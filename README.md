@@ -61,6 +61,24 @@ Buka `js/script.js`, cari daftar `ARTEFAK_ITEMS`. Setiap item punya:
   situs sendiri — tanpa tautan ke Google Sites lama.**
 - `images` untuk galeri foto pendukung (letakkan fotonya di `assets/img/`).
 
+## Panel Admin (cara termudah — tanpa edit kode)
+
+Buka: **https://ilhamkresna21.github.io/tugas-ppg/admin.html**
+
+1. Buat token GitHub (fine-grained): repository `tugas-ppg` saja,
+   izin **Contents: Read and write** → tempel di panel (sekali saja).
+2. **Tab Foto** — pilih foto → geser/zoom di bingkai → *Simpan & Kirim*
+   (otomatis dinamai & dirapikan ukurannya).
+3. **Tab Dokumen Tugas** — tempel link Google Drive Artefak Siklus 1–4,
+   LK3, dan Lampiran → *Simpan Semua*.
+4. **Tab Video** — tambah/hapus video YouTube/Drive.
+
+Perubahan tersimpan ke `assets/img/` dan `data/dokumen.json` (commit otomatis);
+situs ter-update ±1 menit. Bisa juga dari HP. Token hanya tersimpan di browser Anda.
+
+Situs utama membaca `data/dokumen.json` saat dibuka — bila file gagal dimuat,
+situs tetap tampil normal dengan data default (kosong).
+
 Format item yang sama dipakai oleh **`LAMPIRAN_ITEMS`** (section Lampiran) dan
 **`LK3_ITEMS`** (section Lembar Kerja 3 — Non-Mengajar) di `js/script.js` —
 isi `driveId` dengan cara yang sama agar dokumennya tampil langsung di situs.

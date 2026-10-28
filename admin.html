@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel Admin — Portofolio PPG Ilham Kresnamurti</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <header class="a-header">
+    <div class="a-header__inner">
+      <div>
+        <h1>⚙️ Panel Admin</h1>
+        <p>Portofolio PPG — Ilham Kresnamurti, S.Kom.</p>
+      </div>
+      <a class="a-btn a-btn--ghost" href="index.html" target="_blank" rel="noopener">Lihat Situs ↗</a>
+    </div>
+  </header>
+
+  <main class="a-main">
+
+    <!-- ============ LOGIN ============ -->
+    <section id="loginView" class="a-card a-login">
+      <h2>🔑 Masuk dengan Token GitHub</h2>
+      <p class="a-muted">
+        Token dibutuhkan sekali agar panel bisa mengunggah foto &amp; menyimpan dokumen
+        ke repository Anda. Token <strong>hanya disimpan di browser ini</strong>
+        (localStorage) dan tidak dikirim ke pihak lain selain GitHub.
+      </p>
+
+      <label class="a-field">
+        Repository
+        <input id="repoInput" type="text" value="ilhamkresna21/tugas-ppg" placeholder="owner/nama-repo" autocomplete="off">
+      </label>
+
+      <label class="a-field">
+        Token GitHub (fine-grained)
+        <span class="a-token-row">
+          <input id="tokenInput" type="password" placeholder="github_pat_..." autocomplete="off">
+          <button type="button" id="tokenShow" class="a-btn a-btn--ghost">Tampil</button>
+        </span>
+      </label>
+
+      <details class="a-help">
+        <summary>Cara membuat token (2 menit, sekali saja)</summary>
+        <ol>
+          <li>Buka <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → Settings → Developer settings → Fine-grained tokens</a></li>
+          <li><b>Token name</b>: bebas, mis. <code>panel-ppg</code></li>
+          <li><b>Repository access</b> → <i>Only select repositories</i> → pilih <code>tugas-ppg</code></li>
+          <li><b>Permissions</b> → Repository permissions → <b>Contents</b> → <i>Access</i>: <b>Read and write</b></li>
+          <li> klik <b>Generate token</b>, salin token-nya (mulai <code>github_pat_</code>)</li>
+          <li>Tempel di kolom atas → <b>Simpan &amp; Masuk</b></li>
+        </ol>
+        <p class="a-muted">Token bisa dicabut kapan saja dari halaman GitHub yang sama (button <i>Revoke</i>).</p>
+      </details>
+
+      <p id="loginError" class="a-error" hidden></p>
+      <button id="loginBtn" class="a-btn a-btn--primary a-btn--block">Simpan &amp; Masuk</button>
+    </section>
+
+    <!-- ============ APP ============ -->
+    <section id="appView" hidden>
+
+      <div class="a-topbar">
+        <span id="repoInfo" class="a-muted"></span>
+        <button id="logoutBtn" class="a-btn a-btn--ghost">Keluar</button>
+      </div>
+
+      <nav class="a-tabs">
+        <button class="a-tab active" data-atab="foto">🖼️ Foto</button>
+        <button class="a-tab" data-atab="dok">📄 Dokumen Tugas</button>
+        <button class="a-tab" data-atab="video">🎬 Video</button>
+      </nav>
+
+      <!-- TAB FOTO -->
+      <section id="atab-foto" class="a-panel">
+        <p class="a-muted">
+          Pilih foto → atur dengan <strong>geser</strong> &amp; <strong>zoom</strong> di dalam bingkai
+          (bingkai sudah sesuai rasio slot) → <strong>Simpan &amp; Kirim</strong>.
+          Foto otomatis dirapikan ukurannya, dinamai benar, lalu terunggah ke situs
+          (±1 menit sampai tampil).
+        </p>
+        <div id="photoGrid" class="a-slots"></div>
+      </section>
+
+      <!-- TAB DOKUMEN -->
+      <section id="atab-dok" class="a-panel" hidden>
+        <p class="a-muted">
+          Tempel link Google Drive (akses: <i>Anyone with the link</i>) — ID file otomatis diambil.
+          Klik <b>Pratinjau</b> untuk mengecek. Tekan <b>Simpan Semua</b> untuk menerapkan ke situs.
+        </p>
+        <div id="docGroups"></div>
+        <div class="a-savebar">
+          <button id="saveDocs" class="a-btn a-btn--primary">💾 Simpan Semua ke GitHub</button>
+        </div>
+      </section>
+
+      <!-- TAB VIDEO -->
+      <section id="atab-video" class="a-panel" hidden>
+        <p class="a-muted">
+          Tambahkan video YouTube (<code>youtu.be/...</code>, <code>youtube.com/watch?v=...</code>, Shorts)
+          atau Google Drive (<code>drive.google.com/file/d/...</code>) untuk section Video Mengajar.
+        </p>
+        <div id="videoList"></div>
+        <button id="addVideo" class="a-btn a-btn--ghost">＋ Tambah Video</button>
+        <div class="a-savebar">
+          <button id="saveVideos" class="a-btn a-btn--primary">💾 Simpan Semua ke GitHub</button>
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+  <!-- ============ MODAL CROP FOTO ============ -->
+  <div id="cropModal" class="a-modal" hidden>
+    <div class="a-modal__box">
+      <div class="a-modal__head">
+        <h3 id="cropTitle">Atur Foto</h3>
+        <button id="cropClose" class="a-btn a-btn--ghost" aria-label="Tutup">✕</button>
+      </div>
+      <div class="a-modal__body">
+        <div id="cropFrame" class="a-crop">
+          <img id="cropImg" alt="" draggable="false">
+        </div>
+        <div class="a-crop-controls">
+          <label class="a-zoom">
+            Zoom
+            <input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1">
+          </label>
+          <button id="cropReset" class="a-btn a-btn--ghost">Atur Ulang</button>
+        </div>
+        <p class="a-muted a-hint">
+          Seret foto dengan mouse / jari untuk menggeser. Zoom hanya untuk memperbesar —
+          seluruh bingkai pasti terisi foto (tidak ada garis kosong).
+        </p>
+      </div>
+      <div class="a-modal__foot">
+        <button id="cropCancel" class="a-btn a-btn--ghost">Batal</button>
+        <button id="cropSave" class="a-btn a-btn--primary">💾 Simpan &amp; Kirim</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="a-toast" hidden></div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
